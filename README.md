@@ -1,6 +1,7 @@
 # hackerspace
 
 A new Flutter project.
+-Making the app version of our hackerspace website
 
 ## Getting Started
 
