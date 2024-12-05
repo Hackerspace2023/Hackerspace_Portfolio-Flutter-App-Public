@@ -142,11 +142,10 @@ class FlatHexagonGridPainter extends CustomPainter {
     }
   }
 
-  /// Draw a flat-topped hexagon
   void drawHexagon(Canvas canvas, Paint paint, Offset center, double radius) {
     final path = Path();
     for (int i = 0; i < 6; i++) {
-      final angle = pi / 180 * (60 * i - 30); // Flat-topped orientation
+      final angle = pi / 180 * (60 * i - 30);
       final x = center.dx + radius * cos(angle);
       final y = center.dy + radius * sin(angle);
       if (i == 0) {
