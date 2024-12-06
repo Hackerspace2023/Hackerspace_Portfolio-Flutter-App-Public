@@ -178,7 +178,7 @@ class PointedHexagonGridPainter extends CustomPainter {
       }
     }
     path.close();
-    canvas.drawPath(path, paint); // Draw the hexagon path
+    canvas.drawPath(path, paint);
   }
 
   @override
