@@ -1,0 +1,38 @@
+[
+  {
+    "title": "Project 1",
+    "description": "Description of Project 1",
+    "githubLink": "https://github.com/PriyanshuRaut/ExpenseTracker",
+    "category": "Android"
+  },
+  {
+    "title": "Project 2",
+    "description": "Description of Project 2",
+    "githubLink": "https://github.com/example/project2",
+    "category": "Website"
+  },
+  {
+    "title": "Project 3",
+    "description": "Description of Project 3",
+    "githubLink": "https://github.com/example/project2",
+    "category": "Others"
+  },
+  {
+    "title": "Project 4",
+    "description": "Description of Project 4",
+    "githubLink": "https://github.com/example/project2",
+    "category": "Others"
+  },
+  {
+    "title": "Project 5",
+    "description": "Description of Project 5",
+    "githubLink": "https://github.com/example/project2",
+    "category": "Python"
+  },
+  {
+    "title": "Project 6",
+    "description": "Description of Project 6",
+    "githubLink": "https://github.com/example/project2",
+    "category": "Python"
+  }
+]
