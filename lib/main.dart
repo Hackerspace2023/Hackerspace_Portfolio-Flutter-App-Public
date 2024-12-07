@@ -287,7 +287,7 @@ class _ConnectWithUsSection extends StatelessWidget {
         ),
         IconButton(
           icon: Image.asset(
-            'assets/images/linkedin.png', // Your LinkedIn icon
+            'assets/images/linkedin.png',
             height: 40,
             width: 40,
           ),
