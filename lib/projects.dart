@@ -207,7 +207,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
   Widget _buildBottomNavigationBar() {
     return Container(
       color: Colors.black,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -229,7 +229,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 9),
                     const Text(
                       "Join our community and explore endless possibilities.",
                       style: TextStyle(
@@ -255,7 +255,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
                 ),
               ),
 
-              const SizedBox(width: 20), // Add spacing between columns
+              const SizedBox(width: 15), // Add spacing between columns
 
               // Middle Column: Follow Us On
               Flexible(
@@ -283,30 +283,30 @@ class _ProjectsPageState extends State<ProjectsPage> {
               const SizedBox(width: 20), // Add spacing between columns
 
               // Right Column: Languages
-              Flexible(
+              const Flexible(
                 flex: 1,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "Languages",
                       style: TextStyle(
                         color: Colors.greenAccent,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
+                    SizedBox(height: 8),
+                    Text(
                         "C & C++", style: TextStyle(color: Colors.white70)),
-                    const SizedBox(height: 8),
-                    const Text(
+                    SizedBox(height: 8),
+                    Text(
                         "Javascript", style: TextStyle(color: Colors.white70)),
-                    const SizedBox(height: 8),
-                    const Text(
+                    SizedBox(height: 8),
+                    Text(
                         "Html & Css", style: TextStyle(color: Colors.white70)),
-                    const SizedBox(height: 8),
-                    const Text(
+                    SizedBox(height: 8),
+                    Text(
                         "Python", style: TextStyle(color: Colors.white70)),
                   ],
                 ),
@@ -322,13 +322,13 @@ class _ProjectsPageState extends State<ProjectsPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                "All Copyrights Reserved",
+                "All Rights Reserved",
                 style: TextStyle(color: Colors.greenAccent),
               ),
               GestureDetector(
                 onTap: () => _launchURL("https://example.com/terms"),
                 child: const Text(
-                  "Terms & Conditions",
+                  "Terms & Cond...",
                   style: TextStyle(color: Colors.greenAccent),
                 ),
               ),
