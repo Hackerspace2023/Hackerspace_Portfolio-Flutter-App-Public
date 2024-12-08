@@ -92,7 +92,7 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.photo_album, color: Color(0xFF00FF95)),
             title: const Text(
-              'Gallery',
+              'Our Members',
               style: TextStyle(fontFamily: 'Audiowide', color: Colors.white),
             ),
             onTap: () {

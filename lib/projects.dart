@@ -363,16 +363,9 @@ class _ProjectsPageState extends State<ProjectsPage> {
     );
   }
 
-
   Future<void> _launchURL(String url) async {
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(
-        Uri.parse(url),
-        mode: LaunchMode
-            .externalApplication, // Ensures the browser opens externally
-      );
-    } else {
-      throw "Could not launch $url";
+    if (!await launchUrl(Uri.parse(url))) {
+      throw Exception('Could not launch $url');
     }
   }
 }
