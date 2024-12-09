@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hackerspace/contact_us.dart';
 import 'main.dart';
 import 'about_us.dart';
 import 'projects.dart';
 import 'events.dart';
-import 'gallery.dart';
+import 'our_members.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -99,6 +100,19 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const GalleryPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo_album, color: Color(0xFF00FF95)),
+            title: const Text(
+              'Contact Us',
+              style: TextStyle(fontFamily: 'Audiowide', color: Colors.white),
+            ),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const ContactUsPage()),
               );
             },
           ),

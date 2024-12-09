@@ -34,5 +34,35 @@
     "description": "Description of Project 6",
     "githubLink": "https://github.com/example/project2",
     "category": "Python"
+  },
+  {
+    "title": "Project 7",
+    "description": "Description of Project 7",
+    "githubLink": "https://github.com/example/project2",
+    "category": "Android"
+  },
+  {
+    "title": "Project 8",
+    "description": "Description of Project 8",
+    "githubLink": "https://github.com/example/project2",
+    "category": "Website"
+  },
+  {
+    "title": "Project 9",
+    "description": "Description of Project 9",
+    "githubLink": "https://github.com/example/project2",
+    "category": "Others"
+  },
+  {
+    "title": "Project 10",
+    "description": "Description of Project 10",
+    "githubLink": "https://github.com/example/project2",
+    "category": "Android"
+  },
+  {
+    "title": "Project 11",
+    "description": "Description of Project 11",
+    "githubLink": "https://github.com/example/project2",
+    "category": "Python"
   }
 ]
