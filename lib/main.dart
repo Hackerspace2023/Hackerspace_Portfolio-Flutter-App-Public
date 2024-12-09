@@ -4,7 +4,11 @@ import 'drawer_widget.dart';
 import 'about_us.dart';
 import 'projects.dart';
 import 'events.dart';
-import 'gallery.dart';
+import 'our_members.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'about_us_card.dart';
+import 'member_card.dart';
+import 'project_card.dart';
 
 void main() {
   runApp(const MyApp());
@@ -53,117 +57,141 @@ class HomePage extends StatelessWidget {
       ),
       drawer: const AppDrawer(),
       body: Stack(
-          children: [
+        children: [
           // Hexagonal background
           GestureDetector(
-          onPanUpdate: (details) {
-            _hoveredHexagon = details.localPosition;
-    },
-      onPanEnd: (_) {
-        _hoveredHexagon = null;
-      },
-      child: CustomPaint(
-        painter: PointedHexagonGridPainter(hoveredHexagon: _hoveredHexagon),
-        size: MediaQuery.of(context).size,
-      ),
-    ),
-    SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Logo Section
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Image.asset(
-                    'assets/images/hackerspace_logo.jpeg',
-                    height: 100,
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Hacker Space',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontFamily: 'Audiowide',
-                      color: Color(0xFF00FF95),
-                    ),
-                  ),
-                  const Text(
-                    "Let's hack the future",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
+            onPanUpdate: (details) {
+              _hoveredHexagon = details.localPosition;
+            },
+            onPanEnd: (_) {
+              _hoveredHexagon = null;
+            },
+            child: CustomPaint(
+              painter: PointedHexagonGridPainter(
+                  hoveredHexagon: _hoveredHexagon),
+              size: MediaQuery
+                  .of(context)
+                  .size,
             ),
-            const SizedBox(height: 20),
-
-            // About Us Section
-            _buildSectionTitle("About Us"),
-            _buildSectionCard(
-              content:
-              "Hacker Space is a community of tech enthusiasts driven by innovation and collaboration. Join us to explore the cutting edge of technology!",
-              buttonText: "Learn More",
-              onButtonPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AboutUsPage(),
+          ),
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Logo Section
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        'assets/images/hackerspace_logo.jpeg',
+                        height: 100,
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 40,
+                        child: AnimatedTextKit(
+                          animatedTexts: [
+                            TypewriterAnimatedText(
+                              "Hacker Space",
+                              textStyle: const TextStyle(
+                                fontSize: 28,
+                                color: Colors.grey,
+                              ),
+                              speed: const Duration(milliseconds: 120),
+                            ),
+                          ],
+                          totalRepeatCount: 1,
+                          pause: const Duration(milliseconds: 100),
+                          // Pause after each cycle
+                          isRepeatingAnimation: true,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 40, // Adjust height for better spacing
+                        child: AnimatedTextKit(
+                          repeatForever: true,
+                          animatedTexts: [
+                            TypewriterAnimatedText(
+                              "Let's hack the future",
+                              textStyle: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                              speed: const Duration(milliseconds: 100),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+                const SizedBox(height: 20),
 
-            // Projects Section
-            _buildSectionTitle("Our Projects"),
-            _buildProjectCard(
-              title: "Lorem Ipsum",
-              description:
-              "Explore our latest projects in cybersecurity, AI, and open-source.",
-              image: 'assets/images/sample_project.png',
-              onTap: () {
-                // Define the action when the card is clicked
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProjectsPage(),
+                // About Us Section
+                _buildSectionTitle("About Us"),
+                _buildSectionCard(
+                  content:
+                  "Hacker Space is a community of tech enthusiasts driven by innovation and collaboration. Join us to explore the cutting edge of technology!",
+                  buttonText: "Learn More",
+                  onButtonPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AboutUsPage(),
+                      ),
+                    );
+                  },
+                ),
+
+                // Projects Section
+                _buildSectionTitle("Our Projects"),
+                _buildProjectCard(
+                  title: "Lorem Ipsum",
+                  description:
+                  "Explore our latest projects in cybersecurity, AI, and open-source.",
+                  image: 'assets/images/sample_project.png',
+                  onTap: () {
+                    // Define the action when the card is clicked
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProjectsPage(),
+                      ),
+                    );
+                  },
+                ),
+
+                // Members Section
+                _buildSectionTitle("Our Members"),
+                _buildMemberCard(
+                  name: "John Doe",
+                  description:
+                  "An AI enthusiast with a passion for open-source projects.",
+                  profileImage: 'assets/images/member1.png',
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(
+                            builder: (context) => const GalleryPage()));
+                  },
+                ),
+
+                // Connect With Us Section
+                _buildSectionTitle("Connect With Us"),
+                const _ConnectWithUsSection(),
+
+                // Footer Section
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "© 2024 Hacker Space. All Rights Reserved.",
+                    style: TextStyle(color: Colors.grey),
                   ),
-                );
-                },
+                ),
+              ],
             ),
-
-            // Members Section
-            _buildSectionTitle("Our Members"),
-            _buildMemberCard(
-              name: "John Doe",
-              description:
-              "An AI enthusiast with a passion for open-source projects.",
-              profileImage: 'assets/images/sample_member.png',
-              onTap: (){
-                Navigator.push(context, 
-                MaterialPageRoute(builder: (context)=> const GalleryPage()));
-              },
-            ),
-
-            // Connect With Us Section
-            _buildSectionTitle("Connect With Us"),
-            const _ConnectWithUsSection(),
-
-            // Footer Section
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                "© 2024 Hacker Space. All Rights Reserved.",
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-          ],
-        ),
-    ),
-          ],
+          ),
+        ],
       ),
     );
   }
@@ -187,34 +215,10 @@ class HomePage extends StatelessWidget {
     required String buttonText,
     required VoidCallback onButtonPressed,
   }) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.black,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFF00FF95)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Text(
-              content,
-              style: const TextStyle(color: Colors.white),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: onButtonPressed,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00FF95),
-                foregroundColor: Colors.black,
-              ),
-              child: Text(buttonText),
-            ),
-          ],
-        ),
-      ),
+    return AnimatedGlowingBorderCard(
+      content: content,
+      buttonText: buttonText,
+      onButtonPressed: onButtonPressed,
     );
   }
 
@@ -224,23 +228,11 @@ class HomePage extends StatelessWidget {
     required String image,
     required VoidCallback onTap,
   }) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.black,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFF00FF95)),
-      ),
-      child: ListTile(
-        leading: Image.asset(image, height: 50, fit: BoxFit.cover),
-        title: Text(
-          title,
-          style: const TextStyle(color: Colors.white, fontFamily: 'Audiowide'),
-        ),
-        subtitle: Text(description, style: const TextStyle(color: Colors.grey)),
-        onTap: onTap,
-      ),
-
+    return ProjectCard(
+      title: title,
+      description: description,
+      image: image,
+      onTap: onTap,
     );
   }
 
@@ -250,25 +242,11 @@ class HomePage extends StatelessWidget {
     required String profileImage,
     required VoidCallback onTap,
   }) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.black,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFF00FF95)),
-      ),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundImage: AssetImage(profileImage),
-          radius: 25,
-        ),
-        title: Text(
-          name,
-          style: const TextStyle(color: Colors.white, fontFamily: 'Audiowide'),
-        ),
-        subtitle: Text(description, style: const TextStyle(color: Colors.grey)),
-        onTap: onTap,
-      ),
+    return MemberCard(
+      name: name,
+      description: description,
+      profileImage: profileImage,
+      onTap: onTap,
     );
   }
 }
