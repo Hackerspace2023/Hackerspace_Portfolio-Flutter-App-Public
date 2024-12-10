@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hackerspace/contact_us.dart';
-import 'main.dart';
+import 'package:hackerspace/profile_user.dart';
 import 'about_us.dart';
 import 'projects.dart';
 import 'events.dart';
 import 'our_members.dart';
+import 'home_page.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -45,9 +46,10 @@ class AppDrawer extends StatelessWidget {
               style: TextStyle(fontFamily: 'Audiowide', color: Colors.white),
             ),
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const HomePage()),
+                    (route) => false,
               );
             },
           ),
@@ -58,9 +60,10 @@ class AppDrawer extends StatelessWidget {
               style: TextStyle(fontFamily: 'Audiowide', color: Colors.white),
             ),
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const AboutUsPage()),
+                    (route) => false,
               );
             },
           ),
@@ -71,9 +74,10 @@ class AppDrawer extends StatelessWidget {
               style: TextStyle(fontFamily: 'Audiowide', color: Colors.white),
             ),
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const ProjectsPage()),
+                    (route) => false,
               );
             },
           ),
@@ -84,22 +88,24 @@ class AppDrawer extends StatelessWidget {
               style: TextStyle(fontFamily: 'Audiowide', color: Colors.white),
             ),
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const EventsPage()),
+                    (route) => false,
               );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.photo_album, color: Color(0xFF00FF95)),
+            leading: const Icon(Icons.image, color: Color(0xFF00FF95)),
             title: const Text(
               'Our Members',
               style: TextStyle(fontFamily: 'Audiowide', color: Colors.white),
             ),
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const GalleryPage()),
+                    (route) => false,
               );
             },
           ),
@@ -110,9 +116,25 @@ class AppDrawer extends StatelessWidget {
               style: TextStyle(fontFamily: 'Audiowide', color: Colors.white),
             ),
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const ContactUsPage()),
+                    (route) => false,
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.supervised_user_circle, color: Color(0xFF00FF95)),
+            title: const Text(
+              'Profile',
+              style: TextStyle(fontFamily: 'Audiowide', color: Colors.white),
+            ),
+            onTap: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => UserProfilePage()),
+                    (route) => false,
+
               );
             },
           ),
