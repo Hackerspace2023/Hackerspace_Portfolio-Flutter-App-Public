@@ -1,15 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'register_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
+import 'register_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  //To set up firebase just add the command flutterfire configure and if flutterfire is installed then
-  //the list of projects will be shown then just select the project and then the give the permission to override the firebase
-  //by typing yes.
   runApp(const MainPage());
 }
 
@@ -33,43 +28,40 @@ class MainPage extends StatelessWidget {
 class LandingPage extends StatelessWidget {
   const LandingPage({super.key});
 
+  Future<void> navigateBasedOnAuth(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Check if user details exist in SharedPreferences
+    final name = prefs.getString("name");
+    final email = prefs.getString("email");
+
+    print("Name: $name, Email: $email"); // Debugging line
+
+    if (name != null && email != null) {
+      // User exists, navigate to HomePage
+      print("User found, navigating to HomePage...");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } else {
+      // No user data found, navigate to RegisterPage
+      print("No user data, navigating to RegisterPage...");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => RegisterPage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-
-    Future<void> navigateBasedOnAuth() async {
-      try {
-        // Get the current user
-        User? user = auth.currentUser;
-
-        if (user == null) {
-          // Navigate to RegisterPage if no user is logged in
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => RegisterPage()),
-                (route) => false,
-          );
-        } else {
-          // Navigate to HomePage if the user is logged in
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-                (route) => false,
-
-          );
-        }
-      } catch (e) {
-        // Handle any unexpected errors
-        debugPrint("Error in navigateBasedOnAuth: $e");
-      }
-    }
-
-    // Trigger navigation after the widget is built
-    WidgetsBinding.instance.addPostFrameCallback((_) => navigateBasedOnAuth());
+    // Trigger navigation logic after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) => navigateBasedOnAuth(context));
 
     return const Scaffold(
       body: Center(
-        child: CircularProgressIndicator(), // Show a loading indicator
+        child: CircularProgressIndicator(), // Show a loading indicator while waiting
       ),
     );
   }

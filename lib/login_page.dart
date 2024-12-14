@@ -1,85 +1,95 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'register_page.dart';
 import 'home_page.dart';
 import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   String email = '';
   String password = '';
 
+  // Function to login user with email and password
   void loginUser(BuildContext context) async {
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
+      final response = await http.post(
+        Uri.parse('https://b43f-2405-201-8021-2002-8142-bada-2ff5-adab.ngrok-free.app/login.php'),
+        body: {
+          'email': email,
+          'password': password,
+        },
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login successful!')),
-      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // Check if login is successful
+        if (data['status'] == 'success') {
+          // Fetch and save user data
+          await fetchUserDataAndSave(context, email);
+
+          // Navigate to HomePage
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login successful!')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login failed: ${data['message']}')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: Unable to connect to server')),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: ${e.toString()}')),
+        SnackBar(content: Text('Error: $e')),
       );
     }
   }
 
-  Future<bool> checkIfUserExists(String uid) async {
-    final firestore = FirebaseFirestore.instance;
-    final doc = await firestore.collection('users').doc(uid).get();
-    return doc.exists;
-  }
+  // Function to fetch user data from the PHP API and save to SharedPreferences
+  Future<void> fetchUserDataAndSave(BuildContext context, String email) async {
+    final prefs = await SharedPreferences.getInstance();
 
-
-  Future<void> signInWithGoogle(BuildContext context) async {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
     try {
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+      final response = await http.get(
+        Uri.parse('https://b43f-2405-201-8021-2002-8142-bada-2ff5-adab.ngrok-free.app/get_user_data.php?email=$email'),
+      );
 
-        final AuthCredential credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
 
-        UserCredential userCredential =
-        await _firebaseAuth.signInWithCredential(credential);
-
-        User? user = userCredential.user;
-        if (user != null) {
-          // Check if the user exists in the database
-          bool userExists = await checkIfUserExists(user.uid);
-          if (userExists) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Signed in with Google!')),
-            );
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => HomePage()),
-            );
-          } else {
-            // Sign out the user immediately
-            await _firebaseAuth.signOut();
-            await googleSignIn.signOut();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('User does not exist. Please register first.')),
-            );
-          }
+        // Check for error in response
+        if (data['error'] != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(data['error'])),
+          );
+          return;
         }
+
+        // Save user data in SharedPreferences
+        prefs.setString('name', data['name']);
+        prefs.setString('phone', data['phone_number']);
+        prefs.setString('email', email);
+        prefs.setString('gender', data['gender']);
+
+        print('User data saved successfully.');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load user data')),
+        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Google sign-in failed: $e')),
+        SnackBar(content: Text('Error fetching user data: $e')),
       );
     }
   }
@@ -150,16 +160,6 @@ class LoginPage extends StatelessWidget {
                             }
                           },
                           child: Text("Log In"),
-                        ),
-                        SizedBox(height: 10),
-                        ElevatedButton.icon(
-                          icon: Icon(Icons.login),
-                          label: Text("Log In with Google"),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red),
-                          onPressed: () {
-                            signInWithGoogle(context);
-                          },
                         ),
                         SizedBox(height: 20),
                         GestureDetector(
