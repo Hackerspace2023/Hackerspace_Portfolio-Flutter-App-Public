@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hackerspace/register_page.dart';
+import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:hackerspace/register_page.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'drawer_widget.dart';
-import 'main.dart';
-
-import 'package:hackerspace/home_page.dart';
 
 class UserProfilePage extends StatefulWidget {
   @override
@@ -14,79 +12,91 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
-  final _formKey = GlobalKey<FormState>();
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  String name = '';
-  String email = '';
-  String phoneNumber = '';
-  String gender = 'Male';
-
-  bool isLoading = true;
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  String gender = "Male";
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    fetchUserData();
+    _loadUserData();
   }
 
-  void fetchUserData() async {
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      nameController.text = prefs.getString("name") ?? "";
+      emailController.text = prefs.getString("email") ?? "";
+      phoneController.text = prefs.getString("phone") ?? "";
+      gender = prefs.getString("gender") ?? "Male";
+    });
+  }
+
+  Future<void> _saveUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString("name", nameController.text);
+    await prefs.setString("email", emailController.text);
+    await prefs.setString("phone", phoneController.text);
+    await prefs.setString("gender", gender);
+  }
+
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => RegisterPage()),
+    );
+  }
+
+  Future<void> _updateUserDataToServer() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final url = Uri.parse(
+        "https://b43f-2405-201-8021-2002-8142-bada-2ff5-adab.ngrok-free.app/update_user.php");
+
     try {
-      User? user = _firebaseAuth.currentUser;
-      if (user != null) {
-        DocumentSnapshot doc =
-        await _firestore.collection('users').doc(user.uid).get();
-        if (doc.exists) {
-          setState(() {
-            name = doc['name'] ?? '';
-            email = doc['email'] ?? '';
-            phoneNumber = doc['phone_number'] ?? '';
-            gender = doc['gender'] ?? 'Male';
-            isLoading = false;
-          });
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "email": emailController.text,
+          "name": nameController.text,
+          "phone_number": phoneController.text,
+          "gender": gender,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Profile updated successfully!")),
+          );
+          await _saveUserData();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('User data not found!')),
+            SnackBar(content: Text("Error: ${responseData['message']}")),
           );
         }
-      }
-    } catch (e) {
-      print("Error fetching user data: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to fetch user data')),
-      );
-    }
-  }
-
-  void saveUserData() async {
-    try {
-      User? user = _firebaseAuth.currentUser;
-      if (user != null) {
-        await _firestore.collection('users').doc(user.uid).update({
-          'name': name,
-          'email': email,
-          'phone_number': phoneNumber,
-          'gender': gender,
-        });
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('User profile updated successfully!')),
+          SnackBar(content: Text("Server error: ${response.statusCode}")),
         );
       }
     } catch (e) {
-      print("Error saving user data: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save user data')),
+        SnackBar(content: Text("Network error: $e")),
       );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
-  }
-
-  void logout() async {
-    await _firebaseAuth.signOut();
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const MainPage(),),
-          (route) => false,
-    );
   }
 
   @override
@@ -94,200 +104,152 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Profile"),
+        centerTitle: true,
       ),
       drawer: const AppDrawer(),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Stack(
-        children: [
-          CustomPaint(
-            size: MediaQuery.of(context).size,
-            painter: PointedHexagonGridPainter(),
-          ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                child: const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Profile",
-                      style: TextStyle(
-                        color: Color(0xFF00FF95), // Neon green title
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
-                      ),
-                      textAlign: TextAlign.center,
+      body: CustomPaint(
+        painter: PointedHexagonGridPainter(),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Card(
-                color: Colors.black.withOpacity(0.85),
-                elevation: 8.0,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Form(
-                    key: _formKey,
+                    padding: const EdgeInsets.all(20.0),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
                         const Text(
-                          "User Profile",
+                          "User Info",
                           style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold),
+                            color: Colors.greenAccent,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 10,
+                                color: Colors.greenAccent,
+                                offset: Offset(0, 0),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        _buildTextField(
+                          controller: nameController,
+                          label: "Name",
                         ),
                         const SizedBox(height: 20),
-                        TextFormField(
-                          initialValue: name,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: const InputDecoration(
-                            labelText: "Name",
-                            labelStyle: TextStyle(color: Colors.white),
-                          ),
-                          validator: (value) => value!.isEmpty
-                              ? 'Please enter your name'
-                              : null,
-                          onChanged: (value) {
-                            setState(() {
-                              name = value;
-                            });
-                          },
-                        ),
-                        TextFormField(
-                          initialValue: email,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: const InputDecoration(
-                            labelText: "Email",
-                            labelStyle: TextStyle(color: Colors.white),
-                          ),
-                          keyboardType: TextInputType.emailAddress,
+                        _buildTextField(
+                          controller: emailController,
+                          label: "Email",
                           enabled: false,
                         ),
-                        TextFormField(
-                          initialValue: phoneNumber,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: const InputDecoration(
-                            labelText: "Phone Number",
-                            labelStyle: TextStyle(color: Colors.white),
-                          ),
-                          keyboardType: TextInputType.phone,
-                          validator: (value) => value!.isEmpty
-                              ? 'Please enter your phone number'
-                              : null,
-                          onChanged: (value) {
-                            setState(() {
-                              phoneNumber = value;
-                            });
-                          },
+                        const SizedBox(height: 20),
+                        _buildTextField(
+                          controller: phoneController,
+                          label: "Phone Number",
                         ),
-                        DropdownButtonFormField<String>(
+                        const SizedBox(height: 20),
+                        DropdownButton<String>(
                           value: gender,
-                          dropdownColor: Colors.black,
-                          onChanged: (String? newValue) {
+                          onChanged: (newValue) {
                             setState(() {
                               gender = newValue!;
                             });
                           },
-                          items: ['Male', 'Female', 'Other']
-                              .map((genderOption) => DropdownMenuItem(
-                            child: Text(
-                              genderOption,
-                              style: const TextStyle(
-                                  color: Colors.white),
-                            ),
-                            value: genderOption,
-                          ))
-                              .toList(),
-                          decoration: const InputDecoration(
-                            labelText: "Gender",
-                            labelStyle: TextStyle(color: Colors.white),
+                          items: ["Male", "Female", "Other"]
+                              .map<DropdownMenuItem<String>>((value) {
+                            return DropdownMenuItem(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 30),
+                        ElevatedButton(
+                          onPressed:
+                          isLoading ? null : _updateUserDataToServer,
+                          child: isLoading
+                              ? const CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                              : const Text(
+                            "Save Changes",
+                            style: TextStyle(fontSize: 20),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 30),
                         ElevatedButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              saveUserData();
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF0AAB67),
-                          ),
-                          child: const Text("Save Changes"),
-                        ),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: logout,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 30),
                           ),
-                          child: const Text("Logout"),
+                          onPressed: _logout,
+                          child: const Text(
+                            "Logout",
+                            style: TextStyle(fontSize: 20),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+      {required TextEditingController controller,
+        required String label,
+        bool enabled = true}) {
+    return TextField(
+      controller: controller,
+      enabled: enabled,
+      style: const TextStyle(fontSize: 18),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(fontSize: 18),
+        fillColor: Colors.black,
+        filled: true,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
     );
   }
 }
-// Custom Painter for the Hexagon Grid
+
 class PointedHexagonGridPainter extends CustomPainter {
-  final Offset? hoveredHexagon;
-
-  PointedHexagonGridPainter({this.hoveredHexagon});
-
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.black!
+      ..color = Colors.black
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
-
-    final hoverPaint = Paint()
-      ..color = const Color(0xFF00FF95)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
 
     const hexRadius = 30.0;
     final hexWidth = sqrt(3) * hexRadius;
     final hexHeight = 2 * hexRadius;
-    const verticalSpacing = 0.0;
 
-    for (double y = 0; y < size.height + hexHeight; y += hexHeight * 0.75 + verticalSpacing) {
+    for (double y = 0; y < size.height + hexHeight; y += hexHeight * 0.75) {
       bool isOffsetRow = ((y ~/ (hexHeight * 0.75)) % 2 == 1);
 
       for (double x = 0; x < size.width + hexWidth; x += hexWidth) {
         double xOffset = isOffsetRow ? hexWidth / 2 : 0;
 
         final center = Offset(x + xOffset, y);
-
-        if (center.dx - hexRadius > size.width || center.dy - hexRadius > size.height) {
-          continue;
-        }
-
-        final isHovered = hoveredHexagon != null &&
-            (center - hoveredHexagon!).distance <= hexRadius * 2;
-
-        drawHexagon(canvas, isHovered ? hoverPaint : paint, center, hexRadius);
+        drawHexagon(canvas, paint, center, hexRadius);
       }
     }
   }
@@ -309,5 +271,5 @@ class PointedHexagonGridPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
