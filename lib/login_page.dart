@@ -15,11 +15,14 @@ class LoginPage extends StatelessWidget {
   void loginUser(BuildContext context) async {
     try {
       final response = await http.post(
-        Uri.parse('https://b43f-2405-201-8021-2002-8142-bada-2ff5-adab.ngrok-free.app/login.php'),
-        body: {
-          'email': email,
-          'password': password,
+        Uri.parse('https://41cc-2405-201-8021-2002-11b8-1d04-9635-7ea2.ngrok-free.app/login'),
+        headers: {
+          'Content-Type': 'application/json',  // Corrected to application/json
         },
+        body: jsonEncode({
+          'email': email,  // Stringify the body
+          'password': password,
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -61,7 +64,7 @@ class LoginPage extends StatelessWidget {
 
     try {
       final response = await http.get(
-        Uri.parse('https://b43f-2405-201-8021-2002-8142-bada-2ff5-adab.ngrok-free.app/get_user_data.php?email=$email'),
+        Uri.parse('https://41cc-2405-201-8021-2002-11b8-1d04-9635-7ea2.ngrok-free.app/get_user_data?email=$email'),
       );
 
       if (response.statusCode == 200) {

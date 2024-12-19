@@ -28,7 +28,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
 
     // Initialize the animation controller
     _animationController = AnimationController(
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat(reverse: true);
 
