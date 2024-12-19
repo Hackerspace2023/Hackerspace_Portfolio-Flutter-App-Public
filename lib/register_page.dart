@@ -45,7 +45,7 @@ class _RegisterScreenState extends State<RegisterPage> {
 
   Future<void> registerUser() async {
     final url = Uri.parse(
-        "https://b43f-2405-201-8021-2002-8142-bada-2ff5-adab.ngrok-free.app/register_user.php");
+        "https://41cc-2405-201-8021-2002-11b8-1d04-9635-7ea2.ngrok-free.app/register_user");
 
     final response = await http.post(
       url,
@@ -92,7 +92,7 @@ class _RegisterScreenState extends State<RegisterPage> {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser != null) {
         final url = Uri.parse(
-            "https://b43f-2405-201-8021-2002-8142-bada-2ff5-adab.ngrok-free.app/register_user.php");
+            "https://41cc-2405-201-8021-2002-11b8-1d04-9635-7ea2.ngrok-free.app/register_user");
 
         final response = await http.post(
           url,
@@ -249,8 +249,26 @@ class _RegisterScreenState extends State<RegisterPage> {
                         MaterialPageRoute(builder: (context) => LoginPage()),
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       "Have an account? Log in here.",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 16,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  InkWell(
+                    onTap: () {
+                      // Navigate to the login screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HomePage()),
+                      );
+                    },
+                    child: const Text(
+                      "Login as guests?Click here!.",
                       style: TextStyle(
                         color: Colors.blue,
                         fontSize: 16,

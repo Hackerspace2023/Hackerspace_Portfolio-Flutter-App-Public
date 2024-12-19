@@ -7,7 +7,8 @@
     "linkedin": "https://linkedin.com/in/member1",
     "github": "https://github.com/member1",
     "twitter": "https://twitter.com/member1",
-    "instagram": "https://instagram.com/member1"
+    "instagram": "https://instagram.com/member1",
+    "description": "Member 1 is a passionate developer with a focus on Flutter and mobile app development."
   },
   {
     "name": "Member 2",
@@ -17,7 +18,8 @@
     "linkedin": "https://linkedin.com/in/member2",
     "github": "https://github.com/member2",
     "twitter": "https://twitter.com/member2",
-    "instagram": "https://instagram.com/member2"
+    "instagram": "https://instagram.com/member2",
+    "description": "Member 2 is a passionate developer with a focus on Web development."
   },
   {
     "name": "Member 3",
@@ -27,7 +29,8 @@
     "linkedin": "https://linkedin.com/in/member3",
     "github": "https://github.com/member3",
     "twitter": "https://twitter.com/member3",
-    "instagram": "https://instagram.com/member3"
+    "instagram": "https://instagram.com/member3",
+    "description": "Member 3 is a passionate developer with a focus on being a good Python developer."
   },
   {
     "name": "Member 4",
@@ -37,6 +40,7 @@
     "linkedin": "https://linkedin.com/in/member4",
     "github": "https://github.com/member4",
     "twitter": "https://twitter.com/member4",
-    "instagram": "https://instagram.com/member4"
+    "instagram": "https://instagram.com/member4",
+    "description": "Member 4 is a passionate developer with a focus on Frontend development."
   }
 ]
